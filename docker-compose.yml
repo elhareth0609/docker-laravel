@@ -1,15 +1,9 @@
 version: '3'
 
-networks: 
-    laravel:
-        driver: bridge
-
 services: 
     nginx:
         image: nginx:alpine
         container_name: nginx
-        restart: unless-stopped
-        tty: true
         ports:
             - "8001:8001"
         volumes: 
@@ -18,17 +12,13 @@ services:
         depends_on: 
             - php
             - mysql
-        networks: 
-            - laravel
 
     mysql:
         platform: linux/amd64
         image: mysql
         container_name: mysql
-        restart: unless-stopped
-        tty: true
         ports: 
-            - "${MYSQL_HOST_PORT}:${MYSQL_DOCKER_CONTAINER_PORT}"
+            - "4306:3306"
         volumes: 
             - ./mysql:/var/lib/mysql
         environment: 
@@ -38,20 +28,14 @@ services:
             MYSQL_ROOT_PASSWORD: root
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
-        networks: 
-            - laravel
 
     php:
         build:
             context: .
             dockerfile: Dockerfile
         container_name: php
-        restart: unless-stopped
-        tty: true
         working_dir: /var/www/app
         volumes: 
             - ./src:/var/www/app
         ports: 
-            - "${PHP_HOST_PORT}:${PHP_DOCKER_CONTAINER_PORT}"
-        networks: 
-            - laravel
+            - "9000:9000" 
